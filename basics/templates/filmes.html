@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+  <h2 style='text-align:center;'>Filmes</h2>
+  <hr />
+
+
+<div class="row container-fluid ml-5">
+  {% for filme in filmes %}
+  <div class="col-md-4">
+            <div class="card" style="width: 18rem;">
+              <img class="card-img-top" src="http://image.tmdb.org/t/p/w500{{filme.backdrop_path}}" alt="Imagem de capa do card">
+              <div class="card-body">
+              <h5 class="card-title">{{filme.title}}</h5>
+              <p class="card-text">{{filme.overview}}</p>
+              <a href="#" class="btn btn-primary">Nota: {{filme.vote_average}}</a>
+            </div>
+          </div>
+          </div>
+          {% endfor %}
+  </div>
+{% endblock conteudo %}
