@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+  <h2 style='text-align:center;'>Filmes</h2>
+  <hr />
+
+
+<div class="row container-fluid ml-5">
+  {% for curso in cursos %}
+  <div class="col-md-4 mt-5">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+              <h5 class="card-title">{{curso.nome}}</h5>
+              <p class="card-text">{{curso.desc}}</p>
+              <p class="card-text">{{curso.ch}}</p>
+              <a href="#" class="btn btn-primary">Comprar</a>
+            </div>
+          </div>
+          </div>
+          {% endfor %}
+  </div>
+{% endblock conteudo %}

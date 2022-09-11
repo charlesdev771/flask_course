@@ -1,9 +1,24 @@
 from unicodedata import name
 from flask import Flask, render_template, request
 import urllib.request, json
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__, template_folder='templates')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cursos.sqlite3'
+
+db = SQLAlchemy(app)
+
+class cursos(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.Integer)
+    desc = db.Column(db.String(100))
+    ch = db.Column(db.Integer)
+
+    def __init__(self, nome, desc, ch):
+        self.nome = nome
+        self.desc = desc
+        self.ch = ch
 
 @app.route('/', methods=['GET', 'POST'])
 
@@ -76,5 +91,10 @@ def filmes(propriedade):
 def about():
     return render_template('about.html')
 
+@app.route('/cursos')
+def lista_cursos():
+    return render_template('cursos.html', cursos=cursos.query.all())
 
-app.run(debug=True, port=777)
+if __name__ == '__main__':
+    db.create_all()
+    app.run(debug=True, port=777)
