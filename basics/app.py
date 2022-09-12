@@ -1,12 +1,12 @@
 from unicodedata import name
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 import urllib.request, json
 from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__, template_folder='templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cursos.sqlite3'
-
+app.config['SECRET_KEY'] = 'key'
 db = SQLAlchemy(app)
 
 class cursos(db.Model):
@@ -93,7 +93,48 @@ def about():
 
 @app.route('/cursos')
 def lista_cursos():
-    return render_template('cursos.html', cursos=cursos.query.all())
+    page = request.args.get('page', 1, type=int)
+    per_page = 4
+    todos_cursos = cursos.query.paginate(page, per_page)
+    return render_template('cursos.html', cursos=todos_cursos)
+
+@app.route('/cria_curso', methods=['GET', 'POST'])
+def cria_curso():
+    nome = request.form.get('nome')
+    desc = request.form.get('desc')
+    ch = request.form.get('ch')
+
+    if request.method == 'POST':
+        if not nome or not desc or not ch:
+            flash("Preencha os campos", "error")
+        else:
+            curso = cursos(nome, desc, ch)
+            db.session.add(curso)
+            db.session.commit()
+            return redirect(url_for('lista_cursos'))
+
+    return render_template('novo_curso.html', methods=['GET', 'POST'])
+
+
+@app.route('/<int:id>/atualizar', methods=['GET', 'POST'])
+def atualizar(id):
+    curso = cursos.query.filter_by(id=id).first()
+    if request.method == 'POST':
+        nome = request.form['nome']
+        desc = request.form['desc']
+        ch = request.form['ch']
+
+        cursos.query.filter_by(id=id).update({'nome':nome, 'desc':desc, 'ch':ch})
+        db.session.commit()
+        return redirect(url_for('lista_cursos'))
+    return render_template('atualizar.html', curso=curso)
+
+@app.route('/<int:id>/excluir')
+def excluir(id):
+    curso = cursos.query.filter_by(id=id).first()
+    db.session.delete(curso)
+    db.session.commit()
+    return redirect(url_for('lista_cursos'))
 
 if __name__ == '__main__':
     db.create_all()
